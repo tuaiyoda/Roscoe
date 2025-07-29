@@ -66,5 +66,63 @@
       </div>
     </div>
   </div>
+
+  <script>
+  // Scenario data
+  const scenarios = { 
+    P50: { flip: "6/2032", cash: 10 },
+    P75: { flip: "6/2033", cash: 20 },
+    P95: { flip: "6/2034", cash: 100 },
+    P99: { flip: "6/2035", cash: 100 }
+  };
+
+  const flipDateElement = document.getElementById("flip-date");
+  const slider = document.getElementById("allocation-slider");
+  const cashDisplay = document.getElementById("cash-allocation");
+  const taxDisplay = document.getElementById("tax-allocation");
+
+  // Handle scenario toggles
+  document.querySelectorAll(".scenario-toggle").forEach(button => {
+    button.addEventListener("click", () => {
+      const selected = button.dataset.scenario;
+      
+      // Update flip date
+      flipDateElement.textContent = scenarios[selected].flip;
+      flipDateElement.classList.add("scale-110");
+      setTimeout(() => flipDateElement.classList.remove("scale-110"), 300);
+
+      // Update allocation automatically based on scenario
+      const cash = scenarios[selected].cash;
+      const tax = 100 - cash;
+      slider.value = cash;
+      cashDisplay.textContent = cash + "%";
+      taxDisplay.textContent = tax + "%";
+
+      // Animate background based on allocation
+      document.body.style.background = cash > 50 
+        ? "linear-gradient(135deg, #B3E5FC, #D1C4E9)"  // Cash-heavy
+        : "linear-gradient(135deg, #E1BEE7, #B39DDB)";  // Tax-heavy
+
+      // Update toggle highlight
+      document.querySelectorAll(".scenario-toggle").forEach(b => b.classList.remove("bg-blue-600", "text-white"));
+      button.classList.add("bg-blue-600", "text-white");
+    });
+  });
+
+  // Manual slider control
+  slider.addEventListener("input", () => {
+    const cash = slider.value;
+    const tax = 100 - cash;
+    cashDisplay.textContent = cash + "%";
+    taxDisplay.textContent = tax + "%";
+
+    // Animate background
+    document.body.style.background = cash > 50 
+      ? "linear-gradient(135deg, #B3E5FC, #D1C4E9)"
+      : "linear-gradient(135deg, #E1BEE7, #B39DDB)";
+  });
+</script>
+
+
 </body>
 </html>
