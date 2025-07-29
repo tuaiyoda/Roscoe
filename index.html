@@ -8,92 +8,99 @@
   <style>
     body {
       background: linear-gradient(135deg, #B3E5FC, #D1C4E9);
+      transition: background 0.5s ease-in-out;
+    }
+    .highlight {
+      transition: all 0.3s ease-in-out;
     }
   </style>
 </head>
 <body class="font-sans text-gray-900">
   <div class="max-w-6xl mx-auto px-6 py-16">
     <div class="bg-white bg-opacity-80 rounded-3xl p-10 shadow-xl">
-      <div class="flex items-center mb-8">
-        <div class="w-4 h-4 bg-blue-600 rounded-full mr-2"></div>
-        <h1 class="text-xl font-bold tracking-tight text-blue-900">Roscoe AI</h1>
+      <h1 class="text-4xl font-extrabold text-gray-900 mb-6 text-center">Roscoe AI</h1>
+      <p class="text-lg text-center text-gray-600 mb-8">Analyze tax equity models at the speed of thought. Run scenarios, adjust allocations, and visualize results instantly.</p>
+
+      <!-- Scenario Toggles -->
+      <div class="bg-white p-6 rounded-xl shadow-md mb-6">
+        <h3 class="text-xl font-semibold mb-4">Scenario Toggles</h3>
+        <div class="flex gap-4 justify-center">
+          <button class="scenario-toggle px-4 py-2 rounded border" data-scenario="P50">P50</button>
+          <button class="scenario-toggle px-4 py-2 rounded bg-blue-600 text-white" data-scenario="P75">P75</button>
+          <button class="scenario-toggle px-4 py-2 rounded border" data-scenario="P95">P95</button>
+          <button class="scenario-toggle px-4 py-2 rounded border" data-scenario="P99">P99</button>
+        </div>
       </div>
-      <h2 class="text-4xl font-extrabold text-gray-900 mb-4 leading-tight">Analyze tax equity models<br>at the speed of thought</h2>
-      <p class="text-lg text-gray-600 mb-6">Breeze through complex renewable energy models via natural language. Test model flows, different scenarios —no Excel, no analysts.</p>
-      <button class="bg-blue-600 text-white font-semibold px-6 py-3 rounded-xl shadow-md hover:bg-blue-700 transition">Sign up for free</button>
 
-      <div class="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Model Summary -->
-        <div class="bg-white p-6 rounded-xl shadow-md">
-          <h3 class="text-xl font-semibold mb-4">Model Summary</h3>
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-gray-800 text-sm">
-            <div><span class="block font-medium text-gray-500">IRR</span><span class="text-lg font-bold">7.5%</span></div>
-            <div><span class="block font-medium text-gray-500">Flip Date</span><span class="text-lg font-bold">6/2034</span></div>
-            <div><span class="block font-medium text-gray-500">Credit Type</span><span class="text-lg font-bold">PTC</span></div>
-            <div><span class="block font-medium text-gray-500">Equity Stack</span><span class="text-lg font-bold">45% / 55%</span></div>
-            <div><span class="block font-medium text-gray-500">Depreciation</span><span class="text-lg font-bold">MACRS 5yr</span></div>
-            <div><span class="block font-medium text-gray-500">Max DRO</span><span class="text-lg font-bold">$250,000</span></div>
-            <div><span class="block font-medium text-gray-500">Allocations</span><span class="text-lg font-bold">85% cash / 100% tax</span></div>
-            <div><span class="block font-medium text-gray-500">Paygo Rate</span><span class="text-lg font-bold">$0.55</span></div>
-            <div><span class="block font-medium text-gray-500">Paygo Threshold</span><span class="text-lg font-bold">80%</span></div>
-          </div>
-        </div>
+      <!-- Flip Date -->
+      <div class="bg-white p-6 rounded-xl shadow-md mb-6 text-center">
+        <h4 class="text-lg font-semibold">Flip Date</h4>
+        <p id="flip-date" class="text-3xl font-bold mt-2 highlight">6/2034</p>
+      </div>
 
-        <!-- Scenario Toggles -->
-        <div class="bg-white p-6 rounded-xl shadow-md">
-          <h3 class="text-xl font-semibold mb-4">Scenario Toggles</h3>
-          <div class="grid grid-cols-1 gap-4">
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">Stress Case</label>
-              <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                <option>P50</option>
-                <option>P75</option>
-                <option selected>P95</option>
-                <option>P99</option>
-              </select>
-            </div>
-            <div>
-              <label class="block font-medium text-gray-700 mb-1">Allocation Scenario</label>
-              <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
-                <option>Standard (99/100)</option>
-                <option selected>Balanced (85/100)</option>
-                <option>Aggressive (100/100)</option>
-              </select>
-            </div>
-            <p class="text-sm text-gray-500 mt-2">Flip date updates dynamically based on stress and allocation inputs.</p>
-          </div>
-        </div>
+      <!-- Allocation Slider -->
+      <div class="bg-white p-6 rounded-xl shadow-md text-center">
+        <h3 class="text-xl font-semibold mb-4">Allocation: Cash vs Tax</h3>
+        <input id="allocation-slider" type="range" min="0" max="100" value="85" class="w-full accent-blue-600">
+        <p class="mt-4">Cash: <span id="cash-allocation" class="font-bold">85%</span> | Tax: <span id="tax-allocation" class="font-bold">15%</span></p>
       </div>
     </div>
   </div>
 
+  <!-- JavaScript -->
   <script>
-  const scenarios = { 
-    P50: { flip: "6/2032", cash: 10 },
-    P75: { flip: "6/2033", cash: 20 },
-    P95: { flip: "6/2034", cash: 100 },
-    P99: { flip: "6/2035", cash: 100 }
-  };
+    // Scenario data
+    const scenarios = { 
+      P50: { flip: "6/2032", cash: 10 },
+      P75: { flip: "6/2033", cash: 20 },
+      P95: { flip: "6/2034", cash: 100 },
+      P99: { flip: "6/2035", cash: 100 }
+    };
 
-  const flipDateElement = document.querySelector("div span.font-bold:nth-child(2)"); // Update IRR/flip container
-  const stressSelect = document.querySelectorAll("select")[0]; // First dropdown (stress)
-  const allocationSelect = document.querySelectorAll("select")[1]; // Second dropdown (allocation)
+    const flipDateElement = document.getElementById("flip-date");
+    const slider = document.getElementById("allocation-slider");
+    const cashDisplay = document.getElementById("cash-allocation");
+    const taxDisplay = document.getElementById("tax-allocation");
 
-  stressSelect.addEventListener("change", () => {
-    const selected = stressSelect.value;
-    if (scenarios[selected]) {
-      flipDateElement.textContent = scenarios[selected].flip;
-    }
-  });
+    // Handle scenario toggles
+    document.querySelectorAll(".scenario-toggle").forEach(button => {
+      button.addEventListener("click", () => {
+        const selected = button.dataset.scenario;
 
-  allocationSelect.addEventListener("change", () => {
-    const selectedAllocation = allocationSelect.value;
-    // You can add allocation-specific logic here if needed
-    console.log("Allocation changed to:", selectedAllocation);
-  });
-</script>
+        // Update flip date
+        flipDateElement.textContent = scenarios[selected].flip;
+        flipDateElement.classList.add("scale-110");
+        setTimeout(() => flipDateElement.classList.remove("scale-110"), 300);
 
+        // Update allocation automatically
+        const cash = scenarios[selected].cash;
+        const tax = 100 - cash;
+        slider.value = cash;
+        cashDisplay.textContent = cash + "%";
+        taxDisplay.textContent = tax + "%";
 
+        // Animate background based on allocation
+        document.body.style.background = cash > 50 
+          ? "linear-gradient(135deg, #B3E5FC, #D1C4E9)"  
+          : "linear-gradient(135deg, #E1BEE7, #B39DDB)";
 
+        // Highlight selected button
+        document.querySelectorAll(".scenario-toggle").forEach(b => b.classList.remove("bg-blue-600", "text-white"));
+        button.classList.add("bg-blue-600", "text-white");
+      });
+    });
+
+    // Manual slider control
+    slider.addEventListener("input", () => {
+      const cash = slider.value;
+      const tax = 100 - cash;
+      cashDisplay.textContent = cash + "%";
+      taxDisplay.textContent = tax + "%";
+
+      document.body.style.background = cash > 50 
+        ? "linear-gradient(135deg, #B3E5FC, #D1C4E9)"
+        : "linear-gradient(135deg, #E1BEE7, #B39DDB)";
+    });
+  </script>
 </body>
 </html>
