@@ -32,10 +32,14 @@
         </div>
       </div>
 
-      <!-- Flip Date -->
+      <!-- Model Summary -->
       <div class="bg-white p-6 rounded-xl shadow-md mb-6 text-center">
-        <h4 class="text-lg font-semibold">Flip Date</h4>
-        <p id="flip-date" class="text-3xl font-bold mt-2 highlight">6/2034</p>
+        <h4 class="text-xl font-semibold mb-4">Model Summary</h4>
+        <p class="text-lg"><strong>IRR:</strong> 7.5%</p>
+        <p class="text-lg"><strong>Max DRO:</strong> 40%</p>
+        <p class="text-lg"><strong>Capital Contribution:</strong> $213mm</p>
+        <p class="text-lg"><strong>Flip Date:</strong> <span id="flip-date" class="font-bold highlight">6/2034</span></p>
+        <p class="text-lg"><strong>Paygo:</strong> <span id="paygo" class="font-bold">$0.90/MWh</span></p>
       </div>
 
       <!-- Allocation Slider -->
@@ -49,15 +53,16 @@
 
   <!-- JavaScript -->
   <script>
-    // Scenario data
+    // Scenario data (now includes paygo)
     const scenarios = { 
-      P50: { flip: "6/2032", cash: 10 },
-      P75: { flip: "6/2033", cash: 20 },
-      P95: { flip: "6/2034", cash: 100 },
-      P99: { flip: "6/2035", cash: 100 }
+      P50: { flip: "6/2032", cash: 10, paygo: "$1/MWh" },
+      P75: { flip: "6/2033", cash: 20, paygo: "$0.90/MWh" },
+      P95: { flip: "6/2034", cash: 100, paygo: "$0.80/MWh" },
+      P99: { flip: "6/2035", cash: 100, paygo: "$0/MWh" }
     };
 
     const flipDateElement = document.getElementById("flip-date");
+    const paygoElement = document.getElementById("paygo");
     const slider = document.getElementById("allocation-slider");
     const cashDisplay = document.getElementById("cash-allocation");
     const taxDisplay = document.getElementById("tax-allocation");
@@ -67,10 +72,15 @@
       button.addEventListener("click", () => {
         const selected = button.dataset.scenario;
 
-        // Update flip date
+        // Update flip date & paygo
         flipDateElement.textContent = scenarios[selected].flip;
+        paygoElement.textContent = scenarios[selected].paygo;
         flipDateElement.classList.add("scale-110");
-        setTimeout(() => flipDateElement.classList.remove("scale-110"), 300);
+        paygoElement.classList.add("scale-110");
+        setTimeout(() => {
+          flipDateElement.classList.remove("scale-110");
+          paygoElement.classList.remove("scale-110");
+        }, 300);
 
         // Update allocation automatically
         const cash = scenarios[selected].cash;
